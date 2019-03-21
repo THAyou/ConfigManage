@@ -1,0 +1,56 @@
+﻿@using ConfigManage.Models;
+@{
+    Layout = null;
+
+}
+@model XmlListModel;
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>修改配置</title>
+    <script src="~/jquery-3.3.1.min.js"></script>
+    <script src="~/layui/layui.js"></script>
+    <link href="~/layui/css/layui.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Key:</label>
+        <div class="layui-input-block">
+            <input type="text" id="key" required lay-verify="required" placeholder="Key" readonly="readonly" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Value:</label>
+        <div class="layui-input-inline">
+            <input type="text" id="Value" required lay-verify="required" placeholder="Value" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注:</label>
+        <div class="layui-input-inline">
+            <input type="text" id="Remark" required lay-verify="required" placeholder="备注" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <script>
+        var XID =@Model.XID;
+        var Key = '@Model.XmlRemark';
+        $(document).ready(function () {
+            $.ajax({
+                url: '/XmlService/GetConfig?XID=' + XID + '&key=' + Key,
+                type: 'get',
+                success: function (result) {
+                    if (result.code == 1)
+                    {
+                        $("#key").val(result.data.key);
+                        $("#Value").val(result.data.value);
+                        $("#Remark").val(result.data.remake);
+                    }
+                }
+            });
+            layui.form.render();
+        });
+    </script>
+</body>
+</html>

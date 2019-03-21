@@ -1,0 +1,303 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>后台配置工具</title>
+    <link href="~/layui/css/layui.css" rel="stylesheet" />
+    <!-- 你的HTML代码 -->
+    <script src="~/jquery-3.3.1.min.js"></script>
+    <script src="~/layui/layui.js"></script>
+</head>
+<body>
+    <div class="data-header">
+        <div class="search-v2">
+            <form class="layui-form">
+                <label class="layui-form-label">选择文件</label>
+                <div class="filter">
+                    <div class="layui-input-block " style="width:230px;float:left;">
+                        <select id="XmlFile" lay-verify="required" style="width:230px;">
+                        </select>
+                    </div>
+                </div>
+                <div class="filter">
+                    <a class="layui-btn layui-btn-normal layui-btn-sm" onclick="SetGet()">&nbsp; 查看Config &nbsp; </a>
+                    <a class="layui-btn layui-btn-normal layui-btn-sm" onclick="AddXmlFileList()">&nbsp; 添加路径 &nbsp; </a>
+                    <a class="layui-btn layui-btn-normal layui-btn-sm" onclick="EditXmlFileList()">&nbsp; 编辑路径 &nbsp; </a>
+                    <a class="layui-btn layui-btn-normal layui-btn-sm" onclick="AddConfig()">&nbsp; 新增Config &nbsp; </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <table class="layui-table" lay-filter="test" id="demo"></table>
+    <script>
+        var XID = 0;
+        var Geturl = "/Home/GetConfigList";
+        var tableOption = {
+            elem: '#demo'
+            , url: Geturl //数据接口
+            , cols: [[ //表头
+                {
+                    field: 'key', title: 'Key', templet: function (d) {
+                        if (d.xType != 8) {
+                            return "<b>" + d.key + "</b>"
+                        }
+                        return "";
+                    }
+                }
+                , {
+                    field: 'value', title: 'Value', templet: function (d) {
+                        if (d.xType != 8) {
+                            return "<b>" + d.value + "</b>"
+                        }
+                        return d.value;
+                    }
+                }
+                , { field: 'remake', title: '备注' }
+                , {
+                    field: 'da', title: '备注', templet: function (d) {
+                        if (d.xType != 8) {
+                            var str1 = '<a title="查看" Name="' + d.key + '" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="EditConfig" onclick="EditConfig(this)">修改配置</a> ';
+                            var str2 = '<a title="查看" Name="' + d.key + '" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="delConfig" onclick="delConfig(this)">删除配置</a> ';
+                            return str1+" "+str2;
+                        }
+                        else {
+                            return "<注释>"
+                        }
+
+                    }
+                }
+            ]]
+        };
+        layui.use(['table', 'form'], function () {
+            //第一个实例
+            tableRender(tableOption);
+            GetXmlFileList();
+            
+
+        });
+
+        function EditConfig(obj) {
+            var Key = $(obj).attr("Name");
+            layer.open({
+                type: 2
+                , title: "编辑Config" //不显示标题栏
+                , closeBtn: false
+                , area: ['700px', '350px']
+                , shade: 0.8
+                , btn: ['确认', '取消']
+                , moveType: 1 //拖拽模式，0或者1
+                , content: '/Home/EditConfig?XID=' + XID + '&key=' + Key
+                , yes: function (index, layero) {
+                    var body = layer.getChildFrame('body', index);
+                    var key = body.find("#key").val();
+                    var value = body.find("#Value").val();
+                    var Remark = body.find("#Remark").val();
+                    $.ajax({
+                        url: '/XmlService/SetConfigValue',
+                        type: 'POST',
+                        data: { XID: XID, key: key, value: value, Remark: Remark },
+                        success: function (result) {
+                            if (result.code == 1) {
+                                top.layer.alert("修改成功");
+                                layer.close(index);
+                                SetGet();
+                            }
+                            else {
+                                layer.msg('修改成功');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function tableRender(tableOption)
+        {
+            var table = layui.table;
+            table.render(tableOption);
+        }
+
+        function SetGet() {
+            XID = $("#XmlFile option:selected").val();
+            Geturl = "/Home/GetConfigList?XID=" + XID;
+            tableOption.url = Geturl;
+            tableRender(tableOption);
+        }
+
+        function GetXmlFileList() {
+            $.ajax({
+                url: '/Home/GetXmlFileList',
+                type: "get",
+                async: false,
+                success: function (result) {
+                    var htmlstr = "";
+                    $.each(result.xmlListModel, function (i, item) {
+                        htmlstr += '<option value=' + item.xid + '>' + item.xmlName + '(' + item.xmlRemark + ')</option>';
+                    });
+                    $("#XmlFile").html("");
+                    $("#XmlFile").append(htmlstr);
+                }
+            });
+            layui.form.render();
+        }
+
+        function AddXmlFileList() {
+            layer.open({
+                type: 2
+                , title: "添加配置路径" //不显示标题栏
+                , closeBtn: false
+                , area: ['700px','350px']
+                , shade: 0.8 
+                , btn: ['确认', '取消']
+                , btnAlign: 'c'
+                , moveType: 1 //拖拽模式，0或者1
+                , content: '/Home/AddXmlFile'
+                , yes: function (index,layero) {
+                    var body = layer.getChildFrame('body', index);
+                    var FilePath = body.find("#FilePath").val();
+                    var FileName = body.find("#FileName").val();
+                    var Remark = body.find("#Remark").val();
+                    $.ajax({
+                        url: '/Home/AddXmlFileJson',
+                        type: 'POST',
+                        data: { Xmlurl: FilePath, XmlName: FileName, XmlRemark: Remark },
+                        success: function (result) {
+                            if (result.code == 1) {
+                                layer.alert("添加成功");
+                                layer.close(index);
+                                top.location.reload();
+                            }
+                            else {
+                                layer.msg('添加失败');
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function EditXmlFileList() {
+            XID = $("#XmlFile option:selected").val();
+            layer.open({
+                type: 2
+                , title: "编辑配置路径" //不显示标题栏
+                , closeBtn: false
+                , area: ['700px', '350px']
+                , shade: 0.8
+                , btn: ['确认', '取消', '删除']
+                , moveType: 1 //拖拽模式，0或者1
+                , content: '/Home/EditXmlFile?XID=' + XID
+                , yes: function (index, layero) {
+                    var body = layer.getChildFrame('body', index);
+                    var XID = body.find("#XID").val();
+                    var FilePath = body.find("#FilePath").val();
+                    var FileName = body.find("#FileName").val();
+                    var Remark = body.find("#Remark").val();
+                    $.ajax({
+                        url: '/Home/EditXmlFileJson',
+                        type: 'POST',
+                        data: { XID: XID, Xmlurl: FilePath, XmlName: FileName, XmlRemark: Remark },
+                        success: function (result) {
+                            if (result.code == 1) {
+                                top.layer.alert("编辑成功");
+                                layer.close(index);
+                                top.location.reload();
+                            }
+                            else {
+                                layer.msg('编辑失败');
+                            }
+                        }
+                    });
+                }
+                , btn3: function (index, layero) {
+                    if (confirm("是否删除"))
+                    {
+                        var body = layer.getChildFrame('body', index);
+                        var XID = body.find("#XID").val();
+                        var FilePath = body.find("#FilePath").val();
+                        var FileName = body.find("#FileName").val();
+                        var Remark = body.find("#Remark").val();
+                        $.ajax({
+                            url: '/Home/DelXmlFileJson',
+                            type: 'POST',
+                            data: { XID: XID, Xmlurl: FilePath, XmlName: FileName, XmlRemark: Remark },
+                            success: function (result) {
+                                if (result.code == 1) {
+                                    top.layer.alert("删除成功");
+                                    layer.close(index);
+                                    top.location.reload();
+                                }
+                                else {
+                                    layer.msg('删除失败');
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        function AddConfig() {
+            layer.open({
+                type: 2
+                , title: "新增Config" //不显示标题栏
+                , closeBtn: false
+                , area: ['700px', '350px']
+                , shade: 0.8
+                , btn: ['确认', '取消']
+                , moveType: 1 //拖拽模式，0或者1
+                , content: '/Home/AddConfig'
+                , yes: function (index, layero) {
+                    var body = layer.getChildFrame('body', index);
+                    var key = body.find("#key").val();
+                    var value = body.find("#Value").val();
+                    var Remark = body.find("#Remark").val();
+                    $.ajax({
+                        url: '/XmlService/AddConfigValue',
+                        type: 'POST',
+                        data: { XID: XID, key: key, value: value, Remark: Remark },
+                        success: function (result) {
+                            if (result.code == 1) {
+                                top.layer.alert("新增成功");
+                                layer.close(index);
+                                SetGet();
+                            }
+                            else {
+                                layer.msg('新增成功');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function delConfig(obj) {
+            var Key = $(obj).attr("Name");
+            if (confirm("是否删除?"))
+            {
+                $.ajax({
+                    url: '/XmlService/DelConfig',
+                    type: 'POST',
+                    data: { XID: XID, Key: Key },
+                    success: function (result) {
+                        if (result.code == 1) {
+                            top.layer.alert("删除成功");
+                            SetGet();
+                        }
+                        else {
+                            layer.msg('删除失败');
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

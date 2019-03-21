@@ -1,0 +1,58 @@
+{
+  "XmlListModel": [
+    {
+      "XID": 6,
+      "XmlUrl": "D:\\AppManage\\App_Data\\App.config",
+      "XmlName": "运营中心",
+      "XmlRemark": "AppManage"
+    },
+    {
+      "XID": 7,
+      "XmlUrl": "D:\\AppManage_CreditCard\\App_Data\\App.config",
+      "XmlName": "信用卡业务",
+      "XmlRemark": "AppManage_CreditCard"
+    },
+    {
+      "XID": 8,
+      "XmlUrl": "D:\\baseManage\\App_Data\\Config\\AppSetting.config",
+      "XmlName": "基础信息管理",
+      "XmlRemark": "baseManage"
+    },
+    {
+      "XID": 9,
+      "XmlUrl": "D:\\CreditApproveManage\\App_Data\\App.config",
+      "XmlName": "信贷中心",
+      "XmlRemark": "CreditApproveManage"
+    },
+    {
+      "XID": 10,
+      "XmlUrl": "D:\\reportCenter\\App_Data\\App.config",
+      "XmlName": "报表中心",
+      "XmlRemark": "reportCenter"
+    },
+    {
+      "XID": 11,
+      "XmlUrl": "D:\\hhd_web\\AppManage\\App_Data\\App.config",
+      "XmlName": "好嗨贷运营中心",
+      "XmlRemark": "hhd_AppManage"
+    },
+    {
+      "XID": 12,
+      "XmlUrl": "D:\\hhd_web\\BaseManage\\App_Data\\Config\\AppSetting.config",
+      "XmlName": "好嗨贷基础信息管理",
+      "XmlRemark": "hhd_BaseManage"
+    },
+    {
+      "XID": 13,
+      "XmlUrl": "D:\\hhd_web\\CreditApproveManage\\App_Data\\App.config",
+      "XmlName": "好嗨贷信贷中心",
+      "XmlRemark": "hhd_CreditApproveManage"
+    },
+    {
+      "XID": 14,
+      "XmlUrl": "D:\\hhd_web\\ReportCenterManage\\App_Data\\App.config",
+      "XmlName": "好嗨贷报表中心",
+      "XmlRemark": "hhd_ReportCenterManage"
+    }
+  ]
+}
